@@ -59,3 +59,9 @@ typings/
 
 # next.js build output
 .next
+
+# my stuff
+/files
+credentials.json
+token.json
+package-lock.json
