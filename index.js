@@ -26,7 +26,6 @@ fs.readFile('credentials.json', (err, googleCreds) => {
 var d = new Date();
 var step = hourGroup(d, modulus);
 
-//var file = fs.openSync(path.join(LOCAL_PATH, `${formatDate(d)}+${pad2(step)}.txt`), 'a');
 var stream = getStream(LOCAL_PATH, d, step);
 
 var busy = false;
@@ -42,8 +41,6 @@ function doWork() {
 	var curStep = hourGroup(d, modulus);
 	if (curStep != step) {
 		step = curStep;
-		//fs.closeSync(file);		
-		//file = fs.openSync(path.join(LOCAL_PATH, `${formatDate(d)}+${pad2(step)}.txt`), 'a');
 		stream.end(() => {
 			authorize(JSON.parse(GOOGLE_CREDS), (auth) => {
 				var oldStream = stream;
@@ -65,7 +62,6 @@ function doWork() {
 			result = `ok\t${rcvd - sent} ms`;
 		}
 		console.log(`${d.toLocaleString()}\t${target}\t${result}`);
-		// fs.writeSync(file, `${d.toLocaleString()}\t${target}\t${result}\n`);
 		stream.write(`${d.toLocaleString()}\t${target}\t${result}\n`);
 		session.close();
 	});
@@ -76,43 +72,41 @@ function doWork() {
 // Create folder if it does not already exist, using an OAuth2 client.
 // Nope. That comment is a lie. Just create the folder. Google Drive is perfectly happy with non-unique names.
 function createFolder(auth) {
-	const drive = google.drive({version: 'v3', auth});
-  
+	const drive = google.drive({version: 'v3', auth});  
+	
 	var fileMetadata = {
-	'name': DRIVE_PATH,
-	mimeType: 'application/vnd.google-apps.folder'
+		'name': DRIVE_PATH,
+		mimeType: 'application/vnd.google-apps.folder'
 	};
 
-	drive.files.create({
-		resource: fileMetadata,
-		fields: 'id'
-		}, (err, folder) => {
-		if (err) {
-		  console.error(err);
-		} else {
-		  DRIVE_PATH_ID = folder.data.id;
-		  console.log('Folder Id: ', folder.data.id);
-		  //uploadFile(drive, folder.data.id);
+	drive.files.create(
+		{
+			resource: fileMetadata,
+			fields: 'id'
+		}, 
+		(err, folder) => {
+			if (err) {
+			  console.error(err);
+			} else {
+			  DRIVE_PATH_ID = folder.data.id;
+			  console.log('Created folder with id: ', folder.data.id);
+			}
 		}
-	});
+	);
 }
 
-/**
- * Upload a file
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
  function uploadFile(fileName, folderId, auth) {
  	console.log(`uploading ${fileName}`);
  	const drive = google.drive({version: 'v3', auth});
   	var fileMetadata = {
 	    'parents': [folderId],
 	    'name': path.basename(fileName)
-  	};
+  	}
 
 	var media = {
 		mimeType: 'text/text',
 		body: fs.createReadStream(fileName)
-	};
+	}
 
 	drive.files.create(
 		{
@@ -120,15 +114,12 @@ function createFolder(auth) {
 			media: media,
 			fields: 'id'
 		}, 
-		function (err, file) {
+		(err, file) => {
 			if (err) {
-			  // Handle error
 			  console.error(err);
 			} else {
-			  //console.log(file);
 			  console.log('File Id: ', file.data.id);			 
 			}
-			callback();
 		}
 	);
  }
