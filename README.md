@@ -6,6 +6,7 @@ Providing internet connectivity is apparently a hard job for my ISP. Really hard
 
 ## How
 1. Clone this repo.
+0. Create a project and generate Drive API credentials in the [Google API Dashboard](https://console.developers.google.com). Alternatively, see this [Quickstart](https://developers.google.com/drive/api/v3/quickstart/nodejs) for Google Drive. Drop the generated `credentials.json` file into your working directory but do _**not**_ commit it. If that's not obvious, you should probably pause.
 0. `npm install googleapis@27`
 0. `npm install net-ping`
 0. `node index.js`
