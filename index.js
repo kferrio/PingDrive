@@ -27,6 +27,7 @@ var d = new Date();
 var step = hourGroup(d, modulus);
 
 var stream = getStream(LOCAL_PATH, d, step);
+var oldpath;
 
 var busy = false;
 var myTimer = setInterval(doWork, 1000);
@@ -37,19 +38,26 @@ function doWork() {
 	}
 
 	busy = true;
-	var d = new Date();
+	d = new Date();
 	var curStep = hourGroup(d, modulus);
 	if (curStep != step) {
 		step = curStep;
-		stream.end(() => {
-			authorize(JSON.parse(GOOGLE_CREDS), (auth) => {
-				var oldStream = stream;
-				uploadFile(oldStream.path, DRIVE_PATH_ID, auth);
-				stream = getStream(LOCAL_PATH, d, step);
-			});			
-		});	
+		oldpath = stream.path;
+		authorize(JSON.parse(GOOGLE_CREDS), (auth) => {
+				stream.end(() => {
+					stream = getStream(LOCAL_PATH, d, step);
+					doPing(session, stream);
+					uploadFile(oldpath, DRIVE_PATH_ID, auth);
+				});				
+		});
+	} else {
+		doPing(session, stream);
 	}
-	
+	busy = false;
+}
+
+
+function doPing(session, stream) {
 	session.pingHost("8.8.8.8", (err, target, sent, rcvd) => {
 		var result;
 		if (err) {
@@ -65,8 +73,6 @@ function doWork() {
 		stream.write(`${d.toLocaleString()}\t${target}\t${result}\n`);
 		session.close();
 	});
-
-	busy = false;
 }
 
 // Create folder if it does not already exist, using an OAuth2 client.
