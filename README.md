@@ -10,6 +10,7 @@ Providing internet connectivity is apparently a hard job for my ISP. Really hard
 0. `npm install googleapis@27`
 0. `npm install net-ping`
 0. `node index.js`
+0. _On first run, you will be prompted to create an OAuth2 token for Google Drive, which will be stored in the working directory._
 
 ## A Few Important Notes
 1. First and foremost, this comes with __ABSOLUTELY NO WARRANTY OF ANY KIND__. This code could expose your Google account to the world, along with everything in it or linked to it. This code could cause you to incur data charges. This code could fill up your Google Drive or cause your computer to burst into flames. This code could even steal your dog. It's that bad. Be smart.
@@ -22,3 +23,6 @@ Providing internet connectivity is apparently a hard job for my ISP. Really hard
 0. This code is _**not**_ stable on Windows 10 if `net-ping` is gyp'ed with Visual Studio 2017 and imported into the official x64 binary for `node-8.12.0` from https://nodejs.org. I was able to get around this by building `node-8.12.0` from source, using the same Visual Studio 2017 build tools used by `gyp` to build `net-ping`.
 0. This is a long list, isn't it?
 0. One more time: This is an ugly hack. Pull requests graciously welcomed. Good luck and _caveat lector!_
+
+## Known Issues
+This code seems to trigger some errors in the uv library, around setting and stopping polls. The error is a little different on each platform (Raspbian, Windows 10, Debian under WSL, _etc._). This makes PingDrive pretty useless for its intended purpose. It's not clear whether this is caused by an error in this script or something deeper. Any help figuring that out would be appreciated.
